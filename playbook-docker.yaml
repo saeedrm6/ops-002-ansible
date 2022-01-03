@@ -1,0 +1,51 @@
+---
+- name: play1
+  hosts: all
+  become: true
+  tasks:
+    - name: Find docker application
+      shell: "which docker"
+      register: result
+      ignore_errors: yes
+
+    - name: Check docker instalation
+      meta: end_host
+      when: result.rc == 0
+
+    - name: apt update
+      apt:
+        update_cache: yes
+
+    - name: Update the apt package index and install packages to allow apt to use a repository
+      apt:
+        name: "{{ item }}"
+        state: latest
+        update_cache: yes
+      loop:
+        [
+            "ca-certificates",
+            "gnupg",
+            "lsb-release"
+        ]
+
+    - name: Add Docker’s official GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+
+    - name: Install Docker Engine
+      apt:
+        name: "{{ item }}"
+        state: latest
+        update_cache: yes
+      loop:
+        [
+            "docker-ce",
+            "docker-ce-cli",
+            "containerd.io"
+        ]

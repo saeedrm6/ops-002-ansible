@@ -22,7 +22,7 @@ apt install -y ansible
 ```
 ansible all -i hosts.ini -m ping
 ```
-## run playbook
+## check & install docker
 ```
-ansible-playbook -i hosts.ini play.yaml
+ansible-playbook -i hosts.ini playbook-docker.yaml
 ```
