@@ -1,0 +1,12 @@
+---
+  - name: play1
+    hosts: all
+    become: true
+    tasks:
+     - name: running apt update command
+       apt:
+        update_cache: yes
+     - name: installing net-tools
+       apt:
+        name: net-tools
+        state: present
