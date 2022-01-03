@@ -1,5 +1,5 @@
 ---
-- name: play1
+- name: docker
   hosts: all
   become: true
   tasks:
@@ -49,3 +49,10 @@
             "docker-ce-cli",
             "containerd.io"
         ]
+
+    - name: Add "ubuntu" user to "docker" group
+      remote_user: ubuntu
+      user:
+        name: "ubuntu"
+        group: "docker"
+        append: yes
