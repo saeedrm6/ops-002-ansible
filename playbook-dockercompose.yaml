@@ -3,6 +3,15 @@
   hosts: all
   become: true
   tasks:
+    - name: Find docker-compose application
+      shell: "which docker-compose"
+      register: result
+      ignore_errors: yes
+
+    - name: Check docker-compose instalation
+      meta: end_host
+      when: result.rc == 0
+
     - name: apt update
       apt:
         update_cache: yes
