@@ -3,14 +3,26 @@
   hosts: all
   become: true
   tasks:
-    - name: Find docker-compose application
-      shell: "which docker-compose"
-      register: result
-      ignore_errors: yes
+#    - name: Find docker-compose application
+#      shell: "which docker-compose"
+#      register: result
+#      ignore_errors: yes
+#
+#    - name: Check docker-compose instalation
+#      meta: end_host
+#      when: result.rc == 0
 
-    - name: Check docker-compose instalation
-      meta: end_host
-      when: result.rc == 0
+    - name: Check current docker-compose version
+      command: docker-compose --version
+      register: docker_compose_vsn
+      changed_when: false
+      failed_when: false
+      check_mode: no
+
+    - set_fact:
+        docker_compose_current_version: "{{ docker_compose_vsn.stdout | regex_search('(\\d+(\\.\\d+)+)') }}"
+      when:
+        - docker_compose_vsn.stdout is defined
 
     - name: apt update
       apt:
@@ -21,4 +33,8 @@
       get_url:
         url: https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-Linux-x86_64
         dest: /usr/local/bin/docker-compose
-        mode: 'u+x,g+x'
+        mode: 'a+x'
+        force: yes
+      when: >
+        docker_compose_current_version is not defined
+        or docker_compose_current_version is version(docker_compose_version, '<')
